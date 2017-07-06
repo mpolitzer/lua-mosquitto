@@ -3,9 +3,10 @@ local screen = { w = love.graphics.getWidth(), h = love.graphics.getHeight()  }
 
 -- coordinator
 local id     = tonumber(arg[2])
+local ip     = arg[3] or "127.0.0.1"
 local coord  = id
 
-love.graphics.setCaption("dofight player: "..id)
+love.window.setTitle("dofight player: "..id)
 --love.window.setTitle("dofight player: "..id)
 
 local ship = {
@@ -16,7 +17,7 @@ local ship = {
 	vp =   0, vc = 1.2, -- angle speed
 	af =   0,
 	sx = 100,           -- x,y
-	sy = 100 * (arg[2]+1),
+	sy = 100 * (id+1),
 	vx =   0, vy =   0, -- velocity
 	ax =   0, ay =   0, -- acceleration
 
@@ -139,7 +140,7 @@ function mqtt_cb(topic, message)
 end
 
 function love.load()
-	mqtt_client = mqtt.client.create("127.0.0.1", 1883, mqtt_cb)
+	mqtt_client = mqtt.client.create(ip, 1883, mqtt_cb)
 	mqtt_client:connect(tostring(ship.id))
 	mqtt_client:subscribe({"ctl"})
 	mqtt_client:subscribe({"partial-update"})
@@ -289,7 +290,7 @@ function love.draw()
 	for _,v in pairs(ships) do
 		if (v.bullets) then
 			for bk,bv in pairs(v.bullets) do
-				love.graphics.point(bv.sx, bv.sy)
+				love.graphics.circle("fill", bv.sx, bv.sy, 2)
 			end
 		end
 		love.graphics.push()
